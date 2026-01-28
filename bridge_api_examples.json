@@ -1,0 +1,101 @@
+# Example JSON Responses for VDJ YouTube Music Plugin Bridge
+
+This file provides example JSON payloads for the REST API endpoints expected by the plugin.
+
+---
+
+## 1. Health Check
+**GET /**
+```json
+{
+  "status": "online",
+  "service": "VDJ Bridge"
+}
+```
+
+---
+
+## 2. Search Results
+**GET /search?q=QUERY**
+```json
+[
+  {
+    "videoId": "4D7u5KF7SP8",
+    "title": "Get Lucky",
+    "artist": "Daft Punk",
+    "album": "Random Access Memories",
+    "duration": 370,
+    "thumbnail": "https://i.ytimg.com/vi/4D7u5KF7SP8/hqdefault.jpg",
+    "isVideo": false
+  },
+  {
+    "videoId": "3GwjfUFyY6M",
+    "title": "Never Gonna Give You Up",
+    "artist": "Rick Astley",
+    "album": "Whenever You Need Somebody",
+    "duration": 215,
+    "thumbnail": "https://i.ytimg.com/vi/3GwjfUFyY6M/hqdefault.jpg",
+    "isVideo": false
+  }
+]
+```
+
+---
+
+## 3. Stream URL
+**GET /get_url?id=VIDEO_ID**
+```json
+{
+  "videoId": "4D7u5KF7SP8",
+  "streamUrl": "file:///C:/Users/YourName/Downloads/4D7u5KF7SP8.m4a",
+  "title": "Get Lucky",
+  "ext": "m4a"
+}
+```
+
+---
+
+## 4. Playlists (optional)
+**GET /playlists**
+```json
+[
+  {
+    "playlistId": "PL1234567890",
+    "title": "My Favorites",
+    "count": 25,
+    "thumbnail": "https://i.ytimg.com/vi/playlist_thumb.jpg"
+  }
+]
+```
+
+---
+
+## 5. Playlist Tracks (optional)
+**GET /playlist_tracks?id=PL1234567890**
+```json
+[
+  {
+    "videoId": "4D7u5KF7SP8",
+    "title": "Get Lucky",
+    "artist": "Daft Punk",
+    "album": "Random Access Memories",
+    "duration": 370,
+    "thumbnail": "https://i.ytimg.com/vi/4D7u5KF7SP8/hqdefault.jpg",
+    "isVideo": false
+  }
+]
+```
+
+---
+
+## 6. Error Example
+**GET /get_url?id=INVALID**
+```json
+{
+  "detail": "Track not found or unavailable"
+}
+```
+
+---
+
+> For more details, see the plugin source code and README.
