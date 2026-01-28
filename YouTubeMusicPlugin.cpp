@@ -1,9 +1,35 @@
 /*
  * Virtual DJ YouTube Music Plugin
  * Version: v1.1.0 (With Visual Feedback)
- * 
- * Bridge architecture: C++ plugin communicates with Python FastAPI backend
- * 
+ *
+ * -------------------------------------------------------------------------
+ *  HOW TO USE THIS PLUGIN (Bridge Guide)
+ * -------------------------------------------------------------------------
+ *
+ * This plugin requires a local backend ("bridge") that exposes a REST API.
+ * The backend is NOT included. You must implement it yourself (see README).
+ *
+ * 1. Write or obtain a backend that exposes at least these endpoints:
+ *    - GET /                 → returns { "status": "online", "service": "VDJ Bridge" }
+ *    - GET /search?q=QUERY   → returns a JSON array of tracks
+ *    - GET /get_url?id=ID    → returns { "videoId": ..., "streamUrl": ..., ... }
+ *    - (optional) /playlists and /playlist_tracks?id=... for playlist support
+ *
+ * 2. Set the backend path:
+ *    - Edit the GetBackendPath() function below to return the folder path
+ *      where your backend (e.g. main.py) is located.
+ *    - Example: return "C:/Users/YourName/Desktop/vdj_plugin_ytmusic/bridge/";
+ *
+ * 3. The plugin will attempt to auto-start the backend if not running.
+ *    - It expects to find a file called main.py in the bridge path.
+ *    - The backend must listen on http://127.0.0.1:8000
+ *
+ * 4. For backend implementation examples, see the README or use FastAPI + ytmusicapi.
+ *
+ * 5. This plugin does NOT provide or distribute any backend code, scripts, or third-party binaries.
+ *    You are responsible for your own backend and for complying with all terms of service.
+ *
+ * -------------------------------------------------------------------------
  * Features:
  * - Search YouTube Music
  * - Browse user playlists (with authentication)
@@ -11,6 +37,9 @@
  * - Auto-start Python backend on load
  * - Visual feedback overlay during stream URL fetching
  */
+
+std::string BPath = "your/Path/to/bridge"; // Path to your backend bridge
+
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "../sdk/vdjPlugin8.h"
@@ -44,6 +73,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
+
+
+
 
 // JSON parsing - using simple manual parsing to avoid dependencies
 // For production, consider using nlohmann/json or rapidjson
@@ -230,31 +262,9 @@ public:
 //////////////////////////////////////////////////////////////////////////
 // Helper class for HTTP requests
 // Get backend directory path - points to Desktop/vdj_plugin_ytmusic/bridge
+// Returns the path to your backend bridge. Edit this to match your backend location.
 inline std::string GetBackendPath() {
-#ifdef BACKEND_PATH
-    return BACKEND_PATH;
-#else
-#ifdef VDJ_WIN
-    char* userprofile = getenv("USERPROFILE");
-    if (userprofile) {
-        return std::string(userprofile) + "\\Desktop\\vdj_plugin_ytmusic\\bridge";
-    }
-    // Fallback for older Windows or missing env var
-    return "C:\\Users\\Public\\Desktop\\vdj_plugin_ytmusic\\bridge";
-#elif defined(__APPLE__)
-    char* home = getenv("HOME");
-    if (home) {
-        return std::string(home) + "/Desktop/vdj_plugin_ytmusic/bridge";
-    }
-    return "/Users/Shared/Desktop/vdj_plugin_ytmusic/bridge";
-#else
-    char* home = getenv("HOME");
-    if (home) {
-        return std::string(home) + "/Desktop/vdj_plugin_ytmusic/bridge";
-    }
-    return "/tmp/vdj_ytmusic";
-#endif
-#endif
+    return BPath;
 }
 
 //////////////////////////////////////////////////////////////////////////
